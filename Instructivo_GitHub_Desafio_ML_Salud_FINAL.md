@@ -419,15 +419,12 @@ health_economics_challenge/
 │   ├── dataset_desafio.csv            ← Datos para trabajar
 │   └── diccionario_variables.md       ← Qué significa cada variable
 ├── codigo_base/
-│   ├── 0_HEALTH_YML.yml               ← Configuración
+│   ├── CONFIG_minimo.yml              ← Configuración
 │   ├── 0_HEALTH_EXE.R                 ← Script principal
-│   └── 01_FE_health_ALUMNO.R          ← Acá van a crear variables
-├── documentacion/
-│   ├── 01_guia_instalacion.md
-│   ├── 02_guia_estrategia_covid.md
-│   └── ...
-└── evaluacion/
-    └── rubrica_evaluacion.md          ← Cómo los vamos a evaluar
+│   ├── 01_FE_health.R                 ← Acá van a crear variables
+│   ├── 02_TS_health.R                 ← Training Strategy
+│   └── 03_HT_health.R                 ← Hyperparameter Tuning
+└── exp/                               ← Resultados (se crea automáticamente)
 ```
 
 ---
@@ -437,7 +434,7 @@ health_economics_challenge/
 Cuando **cualquier integrante** modifique archivos y quiera guardar cambios:
 
 **1. Hacé cambios en los archivos**
-   - Ejemplo: modificás `01_FE_health_ALUMNO.R`
+   - Ejemplo: modificás `01_FE_health.R`
 
 **2. ANTES de hacer Commit: Fetch (traé cambios de tus compañeros)**
    - Arriba a la derecha, hacé clic en: **"Fetch origin"**
@@ -643,7 +640,7 @@ git pull origin main
 git status
 
 # 2. Agregar los archivos modificados
-git add 01_FE_health_ALUMNO.R
+git add 01_FE_health.R
 # O agregar todos:
 git add .
 
@@ -1052,26 +1049,23 @@ ENTREGA FINAL
 
 **Persona A - Variables de Eficiencia:**
 ```r
-# En AgregarVariables():
-- Ratios de gasto/expectativa de vida
-- Gasto per cápita / PIB
-- Indicadores de eficiencia del sistema
+# Ejemplo: Ratios de gasto/expectativa de vida
+dataset[, health_efficiency := SP.DYN.LE00.IN / SH.XPD.CHEX.PC.CD]
+dataset[, health_gdp_ratio := SH.XPD.CHEX.GD.ZS / NY.GDP.PCAP.PP.CD]
 ```
 
 **Persona B - Variables de Tendencias:**
 ```r
-# En AgregarVariables():
-- Tendencias temporales (aceleraciones, desaceleraciones)
-- Cambios año a año
-- Volatilidad de variables clave
+# Ejemplo: Tendencias temporales
+dataset[, life_exp_change := c(NA, diff(SP.DYN.LE00.IN)), by = `Country Code`]
+dataset[, gdp_growth_volatility := rollapply(NY.GDP.MKTP.KD.ZG, 3, sd, fill = NA)]
 ```
 
 **Persona C - Variables de Contexto:**
 ```r
-# En AgregarVariables():
-- Dummies de crisis económicas
-- Variables de desarrollo (HDI, Gini)
-- Interacciones entre variables existentes
+# Ejemplo: Dummies y contexto
+dataset[, crisis_2008 := ifelse(year %in% 2008:2009, 1, 0)]
+dataset[, high_income := ifelse(income == "High", 1, 0)]
 ```
 
 **Todos Juntos:**
@@ -1090,11 +1084,11 @@ ENTREGA FINAL
 
 ✅ Bueno:
 "Subí 3 variables de eficiencia en salud.
-Modifiqué: 01_FE_health_ALUMNO.R (líneas 45-67)
+Modifiqué: 01_FE_health.R (líneas 45-67)
 Pueden hacer pull ahora. - Juan"
 
 ✅ Bueno:
-"Voy a modificar el YML para probar presente=2020.
+"Voy a modificar CONFIG_minimo.yml para probar presente=2020.
 NO toquen el archivo por 30 min. - María"
 
 ✅ Bueno:
@@ -1112,10 +1106,8 @@ health_economics_challenge/          ← Fork del grupo clonado (SÍ pueden modi
 ├── README.md
 ├── dataset/
 ├── codigo_base/
-│   ├── 01_FE_health_ALUMNO.R        ← Modificá ESTE archivo
-│   └── 0_HEALTH_YML.yml             ← Modificá ESTE archivo
-├── documentacion/
-├── evaluacion/
+│   ├── 01_FE_health.R               ← Modificá ESTE archivo
+│   └── CONFIG_minimo.yml            ← Modificá ESTE archivo
 └── mi_trabajo/                      ← Creá esta carpeta para experimentos individuales
     ├── notas_experimentos.md
     ├── graficos/
@@ -1360,7 +1352,7 @@ git branch -d experimento_juan
 # 1. Juan crea su rama
 git checkout -b juan_presente_2018
 
-# 2. Juan modifica 0_HEALTH_YML.yml
+# 2. Juan modifica CONFIG_minimo.yml
 # presente: 2018
 
 # 3. Juan hace commit

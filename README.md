@@ -58,7 +58,7 @@ Los datos incluyen los años 2020-2021 (período COVID-19), que representan un *
 
 ### Las Opciones
 
-Tienen dos parámetros clave en `0_HEALTH_YML.yml` que determinan su estrategia:
+Tienen dos parámetros clave en `CONFIG_minimo.yml` que determinan su estrategia:
 
 1. **`presente`**: ¿Cuál es el último año CON DATOS que usan?
    - `2021` = Incluyen datos hasta 2021 (con COVID completo)
@@ -123,7 +123,7 @@ train:
 
 ### Dataset Principal: `dataset_desafio.csv`
 
-- **Países:** ~78 países válidos (excluidos 12 problemáticos)
+- **Países:** ~78 países válidos
 - **Período:** 2000-2021 (22 años)
 - **Variables:** ~200 indicadores del World Bank (WDI)
 - **Target:** `hf3_ppp_pc` (gasto de bolsillo PPP per cápita)
@@ -167,7 +167,7 @@ Ver `dataset/diccionario_variables.md` para descripciones detalladas de cada var
 ```
 health_economics_challenge/
 ├── README.md                              # Este archivo
-├── 00_CONTEXTO_CONTINUIDAD_PROYECTO.md   # Contexto técnico (referencia)
+├── Instructivo_GitHub_Desafio_ML_Salud_FINAL.md  # Instructivo Git/GitHub
 │
 ├── dataset/
 │   ├── dataset_desafio.csv                # Dataset limpio para ustedes
@@ -175,24 +175,11 @@ health_economics_challenge/
 │   └── metadata_paises.csv                # Info de países
 │
 ├── codigo_base/
-│   ├── 0_HEALTH_YML.yml                   # ⚙️ CONFIGURACIÓN (deben modificar)
+│   ├── CONFIG_minimo.yml                  # ⚙️ CONFIGURACIÓN (deben modificar)
 │   ├── 0_HEALTH_EXE.R                     # Script ejecutor principal
-│   ├── 01_FE_health_ALUMNO.R              # 📝 FEATURE ENGINEERING (deben completar)
+│   ├── 01_FE_health.R                     # 📝 FEATURE ENGINEERING (deben completar)
 │   ├── 02_TS_health.R                     # Training Strategy
-│   ├── 03_HT_health.R                     # Hyperparameter Tuning
-│   └── 04_ZZ_health.R                     # Predicción final (TODO)
-│
-├── documentacion/
-│   ├── 01_guia_instalacion.md             # Setup R, librerías
-│   ├── 02_guia_estrategia_covid.md        # Análisis del dilema COVID
-│   ├── 03_guia_feature_engineering.md     # Hints para crear variables
-│   ├── 04_guia_interpretacion.md          # Cómo interpretar importancia
-│   └── 05_FAQ_tecnico.md                  # Problemas comunes
-│
-├── evaluacion/
-│   ├── rubrica_evaluacion.md              # Criterios de evaluación
-│   ├── checklist_entrega.md               # Qué entregar
-│   └── ejemplos_analisis.md               # Ejemplos de buen análisis
+│   └── 03_HT_health.R                     # Hyperparameter Tuning
 │
 └── exp/                                    # Aquí se guardan resultados (se crea automáticamente)
 ```
@@ -223,7 +210,7 @@ install.packages(c(
 
 ### Paso 3: Ajustar Path del Proyecto
 
-Editar `0_HEALTH_YML.yml` línea 1:
+Editar `CONFIG_minimo.yml` línea 1:
 ```yaml
 environment:
   base_dir: "C:/RUTA/A/TU/CARPETA/health_economics_challenge"  # ← Cambiar esta ruta
@@ -235,7 +222,7 @@ environment:
 
 ### Paso 1: Configurar Estrategia (YML)
 
-Editar `codigo_base/0_HEALTH_YML.yml`:
+Editar `codigo_base/CONFIG_minimo.yml`:
 
 ```yaml
 feature_engineering:
@@ -251,32 +238,35 @@ training_strategy:
 
 ### Paso 2: Crear Variables (Feature Engineering)
 
-Editar `codigo_base/01_FE_health_ALUMNO.R`:
+Editar `codigo_base/01_FE_health.R`:
 
 Completar la función `AgregarVariables()`:
 
 ```r
 AgregarVariables <- function(dataset) {
   gc()
-  
+
   # ========================================
   # AQUÍ CREAN SUS VARIABLES
   # ========================================
-  
-  # Ejemplo: Ratio de eficiencia en salud
-  dataset[, eficiencia_salud := SP.DYN.LE00.IN / SH.XPD.CHEX.PC.CD]
-  
-  # Ejemplo: Dummy para crisis económica 2008
-  dataset[, crisis_2008 := ifelse(year %in% 2008:2009, 1, 0)]
-  
+
+  # EJEMPLO: Calcular años desde el primer registro válido
+  dataset[hf3_ppp_pc > 0, FirstYear := min(year, na.rm = TRUE),
+          by = .(region, `Country Code`)]
+  dataset[, FirstYear := nafill(FirstYear, type = "locf"),
+          by = .(region, `Country Code`)]
+  dataset[, FirstYear := nafill(FirstYear, type = "nocb"),
+          by = .(region, `Country Code`)]
+  dataset[, YearsSinceFirst := year - FirstYear]
+
   # ... MÁS VARIABLES CREADAS POR USTEDES ...
-  
+
   # ========================================
   # LÓGICA DE SEGURIDAD (NO MODIFICAR)
   # ========================================
-  
+
   # [Código de seguridad ya incluido en el archivo]
-  
+
   return(dataset)
 }
 ```
@@ -316,8 +306,8 @@ exp/[nombre_experimento]/
 
 ### 1. Código (30%)
 
-- `01_FE_health_ALUMNO.R` con función `AgregarVariables()` completa
-- `0_HEALTH_YML.yml` con configuración elegida
+- `01_FE_health.R` con función `AgregarVariables()` completa
+- `CONFIG_minimo.yml` con configuración elegida
 - Comentarios explicando razonamiento económico de variables
 
 ### 2. Predicciones (15%)
@@ -379,22 +369,10 @@ Ver `evaluacion/rubrica_evaluacion.md` para criterios detallados.
 
 ## 📚 Recursos y Documentación
 
-### Guías Técnicas
+### Guías Disponibles
 
-1. **[Guía de Instalación](documentacion/01_guia_instalacion.md)**  
-   Setup completo de R, librerías y estructura de proyecto
-
-2. **[Guía del Dilema COVID](documentacion/02_guia_estrategia_covid.md)**  
-   Análisis profundo de trade-offs y configuraciones ejemplo
-
-3. **[Guía de Feature Engineering](documentacion/03_guia_feature_engineering.md)**  
-   Hints conceptuales sobre economía de la salud (sin dar soluciones)
-
-4. **[Guía de Interpretación](documentacion/04_guia_interpretacion.md)**  
-   Cómo leer `tb_importancia.txt` y conectar con teoría económica
-
-5. **[FAQ Técnico](documentacion/05_FAQ_tecnico.md)**  
-   Soluciones a problemas comunes de ejecución
+1. **[Instructivo GitHub](Instructivo_GitHub_Desafio_ML_Salud_FINAL.md)**
+   Guía completa para configurar Git, GitHub y trabajo colaborativo
 
 ### Referencias de Economía de la Salud
 
@@ -419,10 +397,10 @@ Sí, pero deben documentar qué instalar en su README de entrega.
 Comparen el RMSE en validación. Menor RMSE = mejor modelo.
 
 ### ¿Puedo modificar los scripts 02_TS, 03_HT?
-NO. Solo deben modificar `01_FE_health_ALUMNO.R` y `0_HEALTH_YML.yml`.
+NO. Solo deben modificar `01_FE_health.R` y `CONFIG_minimo.yml`.
 
 ### ¿Qué pasa si el pipeline falla?
-Consulten `documentacion/05_FAQ_tecnico.md`. Si el problema persiste, consulten al docente.
+Revisen los mensajes de error y consulten al docente si el problema persiste.
 
 ### ¿Cuántas configuraciones debo probar?
 Mínimo 2 (una con COVID, una sin COVID) para comparar. Más configuraciones = mejor análisis.
