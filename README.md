@@ -181,6 +181,12 @@ health_economics_challenge/
 │   ├── 02_TS_health.R                     # Training Strategy
 │   └── 03_HT_health.R                     # Hyperparameter Tuning
 │
+├── documentacion/
+│   ├── 01_guia_instalacion_rapida.md      # Setup paso a paso
+│   ├── 02_guia_ejecucion_experimentos.md  # Cómo ejecutar y comparar experimentos
+│   ├── 03_guia_recursos_computacionales.md# Optimización para PCs limitadas
+│   └── 04_FAQ_tecnico.md                  # Preguntas frecuentes y soluciones
+│
 └── exp/                                    # Aquí se guardan resultados (se crea automáticamente)
 ```
 
@@ -188,9 +194,11 @@ health_economics_challenge/
 
 ## 🔧 Instalación y Setup
 
+**📖 Guía completa:** [documentacion/01_guia_instalacion_rapida.md](documentacion/01_guia_instalacion_rapida.md)
+
 ### Paso 1: Instalar R y RStudio
 
-Ver `documentacion/01_guia_instalacion.md` para instrucciones detalladas.
+Si aún no los tenés instalados, consultá la [Guía de Instalación](documentacion/01_guia_instalacion_rapida.md#paso-3-instalar-r-y-rstudio).
 
 ### Paso 2: Instalar Librerías Necesarias
 
@@ -281,6 +289,8 @@ source("codigo_base/0_HEALTH_EXE.R")
 
 **Tiempo estimado:** 30-60 minutos (depende del hardware)
 
+**📖 Guía detallada:** [documentacion/02_guia_ejecucion_experimentos.md](documentacion/02_guia_ejecucion_experimentos.md)
+
 ### Paso 4: Analizar Resultados
 
 Los resultados se guardan en:
@@ -369,10 +379,22 @@ Ver `evaluacion/rubrica_evaluacion.md` para criterios detallados.
 
 ## 📚 Recursos y Documentación
 
-### Guías Disponibles
+### Guías Técnicas
 
-1. **[Instructivo GitHub](Instructivo_GitHub_Desafio_ML_Salud_FINAL.md)**
-   Guía completa para configurar Git, GitHub y trabajo colaborativo
+1. **[Guía de Instalación Rápida](documentacion/01_guia_instalacion_rapida.md)**
+   Setup completo de R, RStudio, librerías y primera ejecución
+
+2. **[Guía de Ejecución de Experimentos](documentacion/02_guia_ejecucion_experimentos.md)**
+   Cómo crear, ejecutar y comparar diferentes experimentos (IMPRESCINDIBLE)
+
+3. **[Guía de Recursos Computacionales](documentacion/03_guia_recursos_computacionales.md)**
+   Optimización para computadoras con RAM limitada y cómo pedir dataset reducido
+
+4. **[FAQ Técnico](documentacion/04_FAQ_tecnico.md)**
+   Soluciones a problemas comunes de instalación, ejecución y Git
+
+5. **[Instructivo GitHub](Instructivo_GitHub_Desafio_ML_Salud_FINAL.md)**
+   Guía completa para configurar Git, GitHub y trabajo colaborativo en grupo
 
 ### Referencias de Economía de la Salud
 
@@ -400,7 +422,10 @@ Comparen el RMSE en validación. Menor RMSE = mejor modelo.
 NO. Solo deben modificar `01_FE_health.R` y `CONFIG_minimo.yml`.
 
 ### ¿Qué pasa si el pipeline falla?
-Revisen los mensajes de error y consulten al docente si el problema persiste.
+Consultá la [FAQ Técnico](documentacion/04_FAQ_tecnico.md) para soluciones a problemas comunes.
+
+### ¿Mi computadora no tiene suficiente RAM para correr el pipeline?
+Consultá la [Guía de Recursos Computacionales](documentacion/03_guia_recursos_computacionales.md). Si ningún integrante del grupo puede ejecutarlo, pueden solicitar un dataset reducido.
 
 ### ¿Cuántas configuraciones debo probar?
 Mínimo 2 (una con COVID, una sin COVID) para comparar. Más configuraciones = mejor análisis.
